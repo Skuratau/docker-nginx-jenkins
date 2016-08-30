@@ -1,0 +1,21 @@
+version: "2"
+services:
+    jenkins:
+        build:
+            context: .
+            dockerfile: jenkins.Dockerfile
+        container_name: jenkins
+    nginx:
+        build:
+            context: .
+            dockerfile: nginx.Dockerfile
+        container_name: nginx
+        command: nginx
+        ports: [ "127.0.0.1:80:80" ]
+        network_mode: "private_network"
+        depends_on:
+            - "jenkins"
+    jenkins:
+        image: jenkins
+        container_name: jenkins
+        network_mode: "private_network"
