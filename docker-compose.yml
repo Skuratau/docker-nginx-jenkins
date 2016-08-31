@@ -11,7 +11,7 @@ services:
         depends_on:
             - "jenkins"
         volumes:
-            - data:/data/nginx/cache
+            - cache:/data/nginx/cache
     jenkins:
         image: jenkins
         container_name: jenkins
