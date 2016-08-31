@@ -10,7 +10,14 @@ services:
         network_mode: "private_network"
         depends_on:
             - "jenkins"
+        volumes:
+            - data:/data/nginx/cache
     jenkins:
         image: jenkins
         container_name: jenkins
         network_mode: "private_network"
+        volumes:
+            - data:/var/jenkins_home/
+volumes:
+  data:
+    external: true
