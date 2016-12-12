@@ -1,0 +1,63 @@
+version: '2'
+
+services:
+
+  postgres-server:
+    image: postgres:latest
+    volumes:
+      - /opt/CI/postgres:/var/lib/postgresql/data:rw
+    env_file:
+      - /opt/CI/ansible_containers/ansible/conf/.env_db_pgsql
+    user: root
+    networks:
+      - zbx_net
+    logging:
+      driver: syslog
+      options:
+        tag: "postgre"
+
+
+  zabbix-server:
+    image: zabbix/zabbix-server-pgsql:alpine-3.2-latest
+    ports:
+      - "10051:10051"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /opt/CI/usr/lib/zabbix/alertscripts:/usr/lib/zabbix/alertscripts:ro
+      - /opt/CI/usr/lib/zabbix/externalscripts:/usr/lib/zabbix/externalscripts:ro
+      - /opt/CI/var/lib/zabbix/modules:/var/lib/zabbix/modules:ro
+      - /opt/CI/var/lib/zabbix/enc:/var/lib/zabbix/enc:ro
+      - /opt/CI/var/lib/zabbix/ssh_keys:/var/lib/zabbix/ssh_keys:ro
+      - /opt/CI/var/lib/zabbix/mibs:/var/lib/zabbix/mibs:ro
+      - /opt/CI/var/lib/zabbix/snmptraps:/var/lib/zabbix/snmptraps:rw
+    env_file:
+      - /opt/CI/ansible_containers/ansible/conf/.env_db_pgsql
+      - /opt/CI/ansible_containers/ansible/conf/.env_srv
+    user: root
+    networks:
+      - zbx_net
+    logging:
+      driver: syslog
+      options:
+        tag: "zabbix-server"
+
+  apache:
+    image: zabbix/zabbix-web-apache-pgsql:ubuntu-latest
+    ports:
+      - "80:80"
+    env_file:
+      - /opt/CI/ansible_containers/ansible/conf/.env_db_pgsql
+      - /opt/CI/ansible_containers/ansible/conf/.env_web
+    user: root
+    networks:
+      - zbx_net
+    logging:
+      driver: syslog
+      options:
+        tag: "apache"
+
+
+networks:
+  zbx_net:
+    driver: bridge
